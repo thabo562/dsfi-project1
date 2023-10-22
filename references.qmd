@@ -1,9 +1,12 @@
 ---
 title: "References"
-
 ---
 
-```{r}
-1+1
-```
+-   Akuma, S., Lubem, T. and Adom, I.T., 2022. Comparing Bag of Words and TF-IDF with different models for hate speech detection from live tweets. \*International Journal of
+    Information Technology\*, \*14\*(7), pp.3629-3635.
 
+-   Mokhesi, S.P., 2003. \*Nation-building in South Africa: Mandela and Mbeki Compared\* (Doctoral dissertation, Stellenbosch: Stellenbosch University).
+
+-   Pillai, V.G. and Chandran, L.R., 2020, August. Verdict prediction for indian courts using bag of words and convolutional neural network. In \*2020 Third International Conference on Smart Systems and Inventive Technology (ICSSIT)\* (pp. 676-683). IEEE.
+
+-   

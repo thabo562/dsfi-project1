@@ -56,7 +56,9 @@ Sona_S_tokenized<- Sona_S_tokenized%>% mutate(sentence= str_replace_all(sentence
 
 ```
 
-The dataset is made up of speeches across a span of 28 years by the last 6 presidents of South Africa.
+The dataset is made up of speeches across a span of 28 years by the last 6 presidents of South Africa. The number of speeches made by each president is different which can cause discrepancies in the model building process. F.W. de Klerk and Motlanthe have one recorded speech each, while Nelson Mandela and Cyril Ramaphosa have seven speeches each. In contrast, Jacob Zuma and Thabo Mbeki have given ten speeches each.
+
+As one might naturally expect, the analysis of these presidential speeches highlights the diversity in the communication styles adopted by each president. While it is not uncommon for certain speeches to share common themes or objectives, there is a difference in words and terminology adopted to put across the messages. @fig-Words analysis offers a view into the evolution of linguistic patterns of the different presidents, excluding common stop words commonly found in sentences. A notable shift in the tone of State of the Nation addresses becomes evident when examined over the terms of the presidents.
 
 ```{r Top 20 words}
 #| label: fig-Words
@@ -115,9 +117,11 @@ Motlanthe<-Sona_tokenized%>% group_by(president_13, word)%>%
 grid.arrange(DeKlerk,Mandela,Mbeki,Motlanthe,Zuma,Ramaphosa, ncol=3,nrow=2)
 ```
 
-@fig-Words analysis offers a view into the evolution of linguistic patterns of the different presidents, excluding common stop words commonly found in sentences. A notable shift in the tone of State of the Nation addresses becomes evident when examined over the terms of the presidents.
+During deKlerk's term as president, a government-centric tone is evident, characterized by a significant focus on references to constitutional matters, political parties, and elections. Subsequent presidents, however, adopted a rhetoric that leaned more towards the betterment of the nation as a whole. Notably, Nelson Mandela and Thabo Mbeki, being the first two post-apartheid presidents, directed their attention towards themes of social welfare and national upliftment. Their primary objectives were to lead South Africa through a process of rebuilding and to dismantle the racial barriers that had long persisted under the rule of deKlerk (Mokhetsi, 2003).
 
-During De Klerk's tenure, a government-centric tone is evident, characterized by a notable emphasis on references to the constitution, political parties, and elections. Subsequent presidents, however, steered their rhetoric towards the betterment of the nation. Mandela and Mbeki, in particular, championed themes of social welfare and upliftment. Being the first two presidents post-apartheid presidents their main goals were to rebuild the country and break down the racial barriers. Motlanthe, Zuma, and Ramaphosa, on the other hand, honed their focus on fostering the country's economic development. This shift in presidential language reflects the dynamic trajectory of South Africa's national priorities and the evolving role of its leadership in addressing the needs of the nation.
+In contrast, when Motlanthe, Zuma, and Ramaphosa assumed the presidency, there was a noticeable shift in their focus. They increasingly prioritized the task of fostering the country's economic development. This transformation in presidential language and priorities underscores the dynamic trajectory of South Africa's national agenda and the evolving role of its leadership in addressing the diverse needs and aspirations of the nation.
+
+In addition to the specific words used by each president, the length of their speeches can also be seen as a predictor for which one of them made the speech. The figure below shows long long each presidents speeches run on average.
 
 ```{r}
 #| fig-cap: "Average Sentence Length"
@@ -139,7 +143,7 @@ sc <- sona %>%
 
 ```
 
-@fig-sentences shows long long each presidents speeches run on average.
+As mentioned before, the class imbalances present in the data pay a part in the outcome of the predictions and @fig-sentences shows how much of difference there actually is. deKlerk's speech comprised of only 97 sentences and this is a problem because he only has one speech in the dataset. Motlanthe also had one speech but he used almost 3 times as many sentences as deKlerk. The other presidents averaged about 250 words per speech, except for Ramaphosa who had an average of 327 sentences across his seven speeches. These differences in the number of speeches per president can lead to biased model outcomes. The models may be more inclined to predict or emphasize patterns or language styles associated with presidents who have a larger speech sample, potentially overlooking nuances in the speeches of presidents with fewer samples. To reduce the probability of this outcome, a stratified sampling approach is used, where the sampling proportion is not determined by the total number of observation in the data but rather by a set proportion to be sample from each president to allow for better representation. a random selection of 70% of the sentences made by each presidents are allocated to the training data and the remaining 30% to the test data.
 
 ## Methods
 
@@ -149,7 +153,7 @@ sc <- sona %>%
 
 In the realm of natural language processing, Bag-of-Words (BoW) stands as a valuable text modeling tool. Its primary function is to facilitate the extraction of essential keywords from text while filtering out less critical information. The BoW process begins by establishing a vocabulary based on the words present in the text data. It then represents various speeches by quantifying the frequency of these keywords within each speech. The resulting dataset is an array of speeches against keywords, each entry reflecting the frequency of a specific keyword in a given speech. This foundational approach serves as the basis for machine learning models employed to classify speeches to the president that gave them. The machine learning models tradionally work with numerical data rather than textual data. Text data is unstructured and ML models can only operate with structured data that is well defined so by BoW technique the techniques can be integrated with more ease.
 
-Notably, BoW has found applications in diverse contexts, such as a study in India where it was integrated with Convolutional Neural Networks to classify cases based on keyword analysis from case files. Remarkably, this study achieved an average accuracy rate of 85% (Pillai & Chandran, 2020). The following is a snippet of the BoW done on the SONA speeches. It does how the key words across all speeches become the columns of the array and the tally of each word in the two speeches is in their intersection.
+Notably, BoW has found applications in diverse contexts, such as a study in India where it was integrated with Convolutional Neural Networks to classify cases based on keyword analysis from case files. Remarkably, this study achieved an average accuracy rate of 85% (Pillai & Chandran, 2020). The following is a snippet of the BoW done on the SONA speeches. It shows the key words across all speeches as the columns of the array and the tally of each word in the sentence of a speech is in their intersection.
 
 ```{r Word-bag}
 
@@ -176,7 +180,6 @@ tweets_tdf<- Sona_S_tokenized %>%
   ungroup()
 
 
-
 bag_of_words <- tweets_tdf %>% 
   select(Sent_ID, president_13, word, n) %>% 
   pivot_wider(names_from = word, values_from = n, values_fill = 0)%>%
@@ -189,17 +192,15 @@ knitr::kable(bag_of_words[1:5,c(1,2,5:10)])
 
 ```
 
-@tbl-bag-of-words
-
 #### Tf-Idf
 
-Term Frequency- Inverse Document Frequency (TF_IDF) is another input method used for text modelling.  It is similar to  BoW in that it considers the number of times a word is used in a line of text however, it also factors in how important that word is relative to the other words in the document. The TF measures how frequently a term appears in a document by diving the total number of times the term appears in the document by the total number of terms within that document. This emphasizes the terms that occur more frequently than others. The IDF  measures uniqueness/rarity of a term across a collection of documents. It is calculated by taking the logarithm of the total number of documents in the collection divided by the number of documents containing the term. The logarithm is used to scale down the impact of common words. The two part of the statistical measure are calculated as follows:
+Term Frequency- Inverse Document Frequency (TF_IDF) is another input method used for text modelling.  It is similar to  BoW in that it considers the number of times a word is used in a line of text however, it also factors in how important that word is relative to the other words in the document. The TF measures how frequently a term appears in a document by diving the total number of times the term appears in the document by the total number of terms within that document. This emphasizes the terms that occur more frequently than others. The IDF measures uniqueness/rarity of a term across a collection of documents. It is calculated by taking the logarithm of the total number of documents in the collection divided by the number of documents containing the term. The logarithm is used to scale down the impact of common words. The two part of the statistical measure are calculated as follows:
 
 -   Term Frequency:  (Number of times the term appears in the document) / (Total number of terms in the document)
 
 -   Inverse Document Frequency= In(Total number of documents / Number of documents containing the term)
 
-There have been studies conducted using both BoW and TF-IDF which found that TF-IDF generally out performed BoW when combined with ML models,  however this will not always be the cases because there are countless ML algorithms that exist and each one has a particular method that will allow for the best fit with a given dataset. For example, a study conducted to identify hate speech in tweets found that TF_IDF performed best with Decision trees while BoW performed best with logistic regression, each method obtaining relatively high accuracies. (Akuma et al., 2022)
+There have been studies conducted using both BoW and TF-IDF which found that TF-IDF generally out performed BoW when combined with ML models,  however this will not always be the cases because there are countless ML algorithms that exist and each one has a particular method that will allow for the best fit with a given dataset. For example, a study conducted to identify hate speech in tweets found that TF_IDF performed best with Decision trees while BoW performed best with logistic regression, each method obtaining relatively high accuracies (Akuma et al., 2022).
 
 ```{r}
 #| label: tbl-TF-IDF
@@ -228,7 +229,7 @@ knitr:: kable( tfidf[1:5,c(1:6,19)])
 
 ```
 
-@tbl-TF-IDF
+@tbl-TF-IDF reveals distinct word weights within the sentences, where the weight of a given word varies depending on both the president and the specific sentence. A notable observation is that common words tend to exhibit extreme negative values so as to emphasize the uncommon words that can more easily identify a president's sentence.
 
 ### Predictive Models & Results
 
