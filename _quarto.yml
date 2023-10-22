@@ -6,11 +6,7 @@ website:
   title: "A Quarto Website"
   navbar:
     left:
-<<<<<<< HEAD
       - Assignment1.qmd
-=======
-      - index.qmd
->>>>>>> 6135441c9032adaae88f106c6ed8e5b841d8255b
       - references.qmd
 
 format:
