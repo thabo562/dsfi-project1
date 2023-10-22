@@ -8,8 +8,6 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - addition.qmd
-      - multiplication.qmd
       - references.qmd
 
 format:
