@@ -7,6 +7,12 @@ title: "References"
 
 -   Mokhesi, S.P., 2003. \*Nation-building in South Africa: Mandela and Mbeki Compared\* (Doctoral dissertation, Stellenbosch: Stellenbosch University).
 
+-   Myles, A.J., Feudale, R.N., Liu, Y., Woody, N.A. and Brown, S.D., 2004. An introduction to decision tree modeling. *Journal of Chemometrics: A Journal of the Chemometrics Society*, *18*(6), pp.275-285.
+
 -   Pillai, V.G. and Chandran, L.R., 2020, August. Verdict prediction for indian courts using bag of words and convolutional neural network. In \*2020 Third International Conference on Smart Systems and Inventive Technology (ICSSIT)\* (pp. 676-683). IEEE.
 
--   
+-   Prasanna, P.L. and Rao, D.R., 2018. Text classification using artificial neural networks. *International Journal of Engineering & Technology*, *7*(1.1), pp.603-606.
+
+-   Qader, W.A., Ameen, M.M. and Ahmed, B.I., 2019, June. An overview of bag of words; importance, implementation, applications, and challenges. In \*2019 international engineering conference (IEC)\* (pp. 200-204). IEEE.
+
+-   Shah, K., Patel, H.,Sanghvi, D. and Shah, M., 2020. A comparative analysis of logistic regression, random forest and KNN models for the text classification. \*Augmented Human Research\*, \*5\*, pp.1-16.

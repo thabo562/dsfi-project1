@@ -81,10 +81,6 @@ ul.task-list li input[type="checkbox"] {
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item compact">
-    <a class="nav-link" href="./index.qmd" rel="" target="">
- <span class="menu-text"></span></a>
-  </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./Assignment1.html" rel="" target="" aria-current="page">
  <span class="menu-text">STA5073Z Assignment 1</span></a>
@@ -185,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="input-methods">Input Methods</h3>
 <section id="bag-of-words" class="level4">
 <h4 class="anchored" data-anchor-id="bag-of-words">Bag-of words</h4>
-<p>In the realm of natural language processing, Bag-of-Words (BoW) stands as a valuable text modeling tool. Its primary function is to facilitate the extraction of essential keywords from text while filtering out less critical information. The BoW process begins by establishing a vocabulary based on the words present in the text data. It then represents various speeches by quantifying the frequency of these keywords within each speech. The resulting dataset is an array of speeches against keywords, each entry reflecting the frequency of a specific keyword in a given speech. This foundational approach serves as the basis for machine learning models employed to classify speeches to the president that gave them. The machine learning models tradionally work with numerical data rather than textual data. Text data is unstructured and ML models can only operate with structured data that is well defined so by BoW technique the techniques can be integrated with more ease.</p>
+<p>In the realm of natural language processing, Bag-of-Words (BoW) stands as a valuable text modeling tool. Its primary function is to facilitate the extraction of essential keywords from text while filtering out less critical information. The BoW process begins by establishing a vocabulary based on the words present in the text data. It then represents various speeches by quantifying the frequency of these keywords within each speech. The resulting dataset is an array of speeches against keywords, each entry reflecting the frequency of a specific keyword in a given speech. This foundational approach serves as the basis for machine learning models employed to classify speeches to the president that gave them. The machine learning models tradionally work with numerical data rather than textual data. Text data is unstructured and ML models can only operate with structured data that is well defined so by BoW technique the techniques can be integrated with more ease (Qader et al., 2019)</p>
 <p>Notably, BoW has found applications in diverse contexts, such as a study in India where it was integrated with Convolutional Neural Networks to classify cases based on keyword analysis from case files. Remarkably, this study achieved an average accuracy rate of 85% (Pillai &amp; Chandran, 2020). The following is a snippet of the BoW done on the SONA speeches. It shows the key words across all speeches as the columns of the array and the tally of each word in the sentence of a speech is in their intersection.</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -359,6 +355,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="predictive-models-results">Predictive Models &amp; Results</h3>
 <section id="classification-trees" class="level4">
 <h4 class="anchored" data-anchor-id="classification-trees">Classification Trees</h4>
+<p>A classification tree, often referred to as a decision tree, is as a visual and powerful decision-making tool employed for predictive tasks, for both classification and regression. It aims to forecast outcomes based on the variables of the observations. This decision tree begins at the root node, which initially hinges on the most influential variable for partitioning the dataset effectively. As it evolves, the tree expands by iteratively dividing the data using other attributes from the training dataset. The ultimate aim is to establish a series of decision rules that intuitively partition the observations into their appropriate classes or categories (Myles et al., 2004).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-CT_BOW" class="quarto-figure quarto-figure-center anchored">
@@ -369,10 +366,11 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p><a href="#fig-CT_BOW">Figure&nbsp;3</a> shows a classification tree when text is modelled by BoW. The tree does not have a lot of branches which is indicative of poor classification. The only two presidents can be classified are Mbeki and Zuma , which means every sentence put into the model will return either one of those presidents which is not true. The following table shows the classification using the test dataset:</p>
+<p><a href="#fig-CT_BOW">Figure&nbsp;3</a> shows a classification tree constructed using the BoW approach to model the data. Notably, this tree exhibits a limited structure, with just three branches, resulting in the data being categorized into only two presidents, Mbeki or Zuma. This result is indicative of subpar classification performance. It implies that, according to the model, any sentence input is likely to be assigned to one of these two presidents, which is an oversimplified representation given that there are a total of six presidents in the dataset.</p>
+<p>The subsequent table provides a detailed breakdown of the classification results using the test dataset, shedding light on the implications of this model’s performance.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="tbl-CT-CM" class="anchored">
+<div id="tbl-CT_CM" class="anchored">
 <table class="table table-sm table-striped small">
 <caption>Table&nbsp;2: Confusion matrix for Bag-of-words model</caption>
 <thead>
@@ -446,16 +444,21 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p>The recorded classification rate of this model was 30% meaning the model The model is performing better than random guessing but still has significant room for improvement. The possible reasons for this low classification are unclear as it could be attributed to the model’s performance itself or underlying issues with the data. As previously mentioned in the data analysis, the number of speeches each president makes is different with some making one and others making more than 5, causing a high degree of class imbalance.</p>
+<p>The recorded classification rate of this model was 30% meaning the model is performing better than random guessing but still has significant room for improvement. The possible reasons for this low classification are unclear as it could be attributed to the model’s performance itself or underlying issues with the data. As previously mentioned in the data analysis, the number of speeches each president makes is different with some making one and others making more than 5, causing a high degree of class imbalance.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Assignment1_files/figure-html/CT_TF-IDF-1.png" class="img-fluid" width="672"></p>
+<div id="fig-CT_TF_IDF" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment1_files/figure-html/fig-CT_TF_IDF-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;4: Classification Tree for TF-IDF model</figcaption>
+</figure>
 </div>
 </div>
-<p><strong>?@fig-CT_TF-IDF</strong></p>
+</div>
+<p>The classification tree in <a href="#fig-CT_TF_IDF">Figure&nbsp;4</a> is constructed using the TF-IDF. In contrast to the BoW approach, this tree exhibits a slightly more complex structure with four branches. However, it’s important to note that despite having more branches, the outcomes remain limited to just two presidents, indicating that the model’s classification performance is likely to be comparable to that of the BoW method.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div id="tbl-CT-CM-TF" class="anchored">
+<div id="tbl-CT_CM_TF" class="anchored">
 <table class="table table-sm table-striped small">
 <caption>Table&nbsp;3: Confusion matrix for TF-IDF model</caption>
 <thead>
@@ -529,145 +532,64 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p><a href="#tbl-CT-CM-TF">Table&nbsp;3</a></p>
-<p>The classification rate achieved using the TF-IDF tool stands at 37.8%, demonstrating a slight improvement compared to the performance of the bag of words method, which doesn’t take into account the associated word weights. The table above shows how the observations are still only distributed between Mbeki and Zuma but this time the classification of the observations is more equally distributed between the two. Nevertheless, this accuracy rate remains notably low, suggesting that a basic classification tree might not be the most effective predictive model for the speech text data under investigation. Consequently, the next model to be explored will build upon the foundation of these basic classification trees, aiming to enhance predictive performance and capture the underlying complexities of the text data.</p>
+<p>The classification rate achieved using the TF-IDF tool stands at 37.8%, demonstrating a slight improvement compared to the performance of the bag of words method, which doesn’t take into account the associated word weights. The table above shows how the observations are still only distributed between Mbeki and Zuma but this time the classification of the observations is more equally distributed between the two and the model is better able to predict sentences that belong to Mbeki. Nevertheless, this accuracy rate remains notably low, suggesting that a basic classification tree might not be the most effective predictive model for the speech text data under investigation. Consequently, the next model to be explored will build upon the foundation of these basic classification trees, aiming to enhance predictive performance and capture the underlying complexities of the text data.</p>
 </section>
 <section id="random-forest" class="level4">
 <h4 class="anchored" data-anchor-id="random-forest">Random Forest</h4>
-<p>Random Forest revolves around an ensemble of decision trees reinforced by bagging. Bagging, short for Bootstrap Aggregating, reduces variance and adds stability to these decision trees. It begins by creating multiple subsets of the training data, each of equal size to the original dataset, formed by random selection with potential repetition. These bootstrapped subsets are then used to independently build individual decision trees, each providing a unique perspective on the text data. Once the trees are constructed, they collectively contribute to the final prediction through a majority vote. This aggregation enhances robustness and accuracy, particularly beneficial for text data.</p>
-<p>Additionally, Random Forest introduces random feature selection, where only a subset of features is considered at each node during tree construction, helping to reduce correlation between the trees and avoid overfitting, which is a common challenge when dealing with high-dimensional text data. Additionally, it offers the capability to assess variable importance by considering the random feature selection, providing insights into the crucial elements determining the president which said the given sentence. The figure below shows the error rate of the random forest as the number of trees increase.</p>
+<p>Random Forest revolves around an ensemble of decision trees reinforced by bagging. Bagging, short for Bootstrap Aggregating, reduces variance and adds stability to these decision trees. It begins by creating multiple subsets of the training data, each of equal size formed by random selection with potential repetition. These bootstrapped subsets are then used to independently build individual decision trees, each providing a unique perspective on the text data. Once the trees are constructed, they collectively contribute to the final prediction through a majority vote. This aggregation enhances robustness and accuracy, particularly beneficial for text data (Shah et al., 2020)</p>
+<p>Additionally, Random Forest introduces random feature selection, where only a subset of features is considered at each node during tree construction, helping to reduce correlation between the trees and avoid overfitting, which is a common challenge when dealing with high-dimensional text data (Shah et al., 2020). Additionally, it offers the capability to assess variable importance by considering the random feature selection, providing insights into the key elements that determine the president that said the given sentence. <a href="#fig-RF_BOW">Figure&nbsp;5</a> shows the error rate of the random forest as the number of trees increase.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-RF_BOW" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="Assignment1_files/figure-html/fig-RF_BOW-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;4: BoW Random forest error rate</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;5: BoW Random forest error rate</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-RF_BOW">Figure&nbsp;4</a></p>
-<p>As the number of trees in the model increases, it acquires a deeper understanding of the data, leading to a reduction in the error rate. Beginning with an initial error rate of 60%, by the 20th tree, the model shows improvement, successfully decreasing the error rate by 10%. This method is computationally expensive and so only 20 trees were considered. At this point it is unclear whether an increase in the number of trees will improve the accuracy of the test or lead to diminishing returns. All that can be said is that the error rate is better than that of the previous model.</p>
-<p>::: {#tbl-RF-CM-BOW .cell tbl-cap=’ Random Forest Confusion matrix for BoW model’} ::: {.cell-output-display} | | deKlerk| Mandela| Mbeki| Motlanthe| Ramaphosa| Zuma| class.error| |:———|——-:|——-:|—–:|———:|———:|—-:|———–:| |deKlerk | 10| 8| 17| 0| 11| 21| 0.8507463| |Mandela | 4| 315| 401| 3| 139| 296| 0.7279793| |Mbeki | 2| 215| 891| 2| 199| 375| 0.4709026| |Motlanthe | 0| 32| 69| 1| 30| 54| 0.9946237| |Ramaphosa | 0| 98| 287| 0| 819| 387| 0.4852294| |Zuma | 2| 121| 352| 2| 286| 1081| 0.4137744| ::: :::</p>
+<p>As the number of trees in the model increases, it acquires a deeper understanding of the data, leading to a reduction in the error rate. Starting with an initial error rate of 60%, by the 20th tree, the model shows improvement, successfully decreasing the error rate by 10%. This method is computationally expensive and so only 20 trees were considered. At this point it is unclear whether an increase in the number of trees will improve the accuracy of the test or lead to diminishing returns. All that can be said is that the error rate is better than that of the previous model.</p>
+<p>::: {#tbl-RF_CM_BOW .cell tbl-cap=’ Random Forest Confusion matrix for BoW model’} ::: {.cell-output-display} | | deKlerk| Mandela| Mbeki| Motlanthe| Ramaphosa| Zuma| class.error| |:———|——-:|——-:|—–:|———:|———:|—-:|———–:| |deKlerk | 10| 8| 17| 0| 11| 21| 0.8507463| |Mandela | 4| 315| 401| 3| 139| 296| 0.7279793| |Mbeki | 2| 215| 891| 2| 199| 375| 0.4709026| |Motlanthe | 0| 32| 69| 1| 30| 54| 0.9946237| |Ramaphosa | 0| 98| 287| 0| 819| 387| 0.4852294| |Zuma | 2| 121| 352| 2| 286| 1081| 0.4137744| ::: :::</p>
 <p>For the presidents with fewer speeches in the dataset, such as deKlerk and Motlanthe, the error rates are notably high, with deKlerk reaching an error rate of 85.1% and Motlanthe experiencing a much more substantial error rate of 99.5%. Interestingly, this analysis reveals recurring patterns where a significant portion of deKlerk’s speeches are misclassified as Zuma, and Motlanthe’s speeches are predominantly classified as Mbeki.</p>
-<p>On the other hand, for more prolific presidents like Mbeki and Zuma, the error rates are comparatively lower, with Mbeki achieving an error rate of 47.1% and Zuma having an error rate of 41.4%. However, it’s worth noting that the error rate for Zuma’s speeches has seen a notable increase in comparison to previous models, while Mbeki’s error rate has seen a significant decrease. These observations shed light on the model’s performance in handling classes with imbalanced data, indicating potential areas for improvement in correctly classifying the speeches of less frequently represented presidents.</p>
+<p>On the other hand, for presidents with more speeches like Mbeki and Zuma, the error rates are comparatively lower, with Mbeki achieving an error rate of 47.1% and Zuma having an error rate of 41.4%. However, it’s worth noting that the error rate for Zuma’s speeches has seen an increase in comparison to previous models, while Mbeki’s error rate has seen a significant decrease. These observations shed light on the model’s performance in handling classes with imbalanced data, indicating potential areas for improvement in correctly classifying the speeches of less frequently represented presidents.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-RF_VarImp" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="Assignment1_files/figure-html/fig-RF_VarImp-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption class="figure-caption">Figure&nbsp;5: RF Variable Importance</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;6: RF Variable Importance for BoW</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-RF_VarImp">Figure&nbsp;5</a> shows the top 30 most important features, each possessing a mean decrease Gini score exceeding 5. This score reflects the feature’s contribution to the reduction of Gini impurity, with higher scores indicating greater importance in the model’s predictive capability. The analysis has identified the two most influential words as ‘compatriots’ and ‘regard,’ both exhibiting mean decrease Gini scores exceeding 30. Following ,with a score of almost half, are ‘rand’ and ‘capture’ with mean decrease Gini scores just below 15. The same modelling is conducted on the TF-IDF data and the results were as follows:</p>
+<p><a href="#fig-RF_VarImp">Figure&nbsp;6</a> shows the top 30 most important features, each possessing a mean decrease Gini score exceeding 5. This score reflects the feature’s contribution to the reduction of Gini impurity, with higher scores indicating greater importance in the model’s predictive capability. The analysis has identified the two most influential words as ‘compatriots’ and ‘regard,’ both exhibiting mean decrease Gini scores exceeding 30. Following ,with a score of almost half, are ‘rand’ and ‘capture’ with mean decrease Gini scores just below 15. The same modelling is conducted on the TF-IDF data and the results were as follows:</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Assignment1_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<div id="fig-RF_TF" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment1_files/figure-html/fig-RF_TF-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;7: TF-IDF Random forest error rate</figcaption>
+</figure>
 </div>
 </div>
-<p>The gradual decrease in error rate is almost identical to the bag of words model starting at about 60% and falling to 52% after 20 trees. This similarity may suggest that, at least up to this point, the additional complexity brought by the ensemble learning technique (as represented by the number of trees) yields a consistent and comparable improvement in predictive accuracy for both the BoW model and TF-IDF.</p>
+</div>
+<p>The gradual decrease in error rate shown in <a href="#fig-RF_TF">Figure&nbsp;7</a> is almost identical to the BoW model starting at about 60% and falling to 52% after 20 trees. This similarity may suggest that, at least up to this point, the additional complexity brought by the ensemble learning technique (as represented by the number of trees) yields a consistent and comparable improvement in predictive accuracy for both the BoW model and TF-IDF.</p>
+<p>::: {#tbl-RF_CM_TF .cell tbl-cap=’ Random Forest Confusion matrix for TF-IDF model’} ::: {.cell-output-display} | | deKlerk| Mandela| Mbeki| Motlanthe| Ramaphosa| Zuma| class.error| |:———|——-:|——-:|—–:|———:|———:|—-:|———–:| |deKlerk | 1| 9| 19| 0| 7| 32| 0.9852941| |Mandela | 0| 246| 449| 3| 162| 306| 0.7890223| |Mbeki | 2| 237| 829| 1| 206| 419| 0.5106257| |Motlanthe | 0| 26| 74| 0| 33| 54| 1.0000000| |Ramaphosa | 0| 104| 253| 2| 731| 511| 0.5434104| |Zuma | 3| 124| 256| 3| 308| 1166| 0.3731183| ::: :::</p>
+<p><strong>?@tbl-RF_CM_TF</strong> presents class errors in the TD-IDF model for each president. In comparison to the BoW approach, only sentences attributed to Zuma and Mbeki exhibited improved performance. Other presidents experienced an increase in class errors. For instance, DeKlerk’s class error rose by 13%, while Ramaphosa’s class error saw an 8% increase. This shows how the TF-IDF was not effective across all the presidential classes although it did record a slightly higher overall classification rate of 51,1% compared to that of the BoW which was 50.6%. <a href="#fig-RF_VarImp_IDF">Figure&nbsp;8</a> shows that the TF-IDF model had similar mean decrease Gini for the words of importance,with the addition of some stop words which were not remove in the case of this model such as ‘the’ and ‘of’</p>
 <div class="cell">
 <div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 14%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 8%">
-<col style="width: 14%">
-<col style="width: 14%">
-<col style="width: 7%">
-<col style="width: 17%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">deKlerk</th>
-<th style="text-align: right;">Mandela</th>
-<th style="text-align: right;">Mbeki</th>
-<th style="text-align: right;">Motlanthe</th>
-<th style="text-align: right;">Ramaphosa</th>
-<th style="text-align: right;">Zuma</th>
-<th style="text-align: right;">class.error</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">deKlerk</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">32</td>
-<td style="text-align: right;">0.9852941</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Mandela</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">246</td>
-<td style="text-align: right;">449</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">162</td>
-<td style="text-align: right;">306</td>
-<td style="text-align: right;">0.7890223</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Mbeki</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">237</td>
-<td style="text-align: right;">829</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">206</td>
-<td style="text-align: right;">419</td>
-<td style="text-align: right;">0.5106257</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Motlanthe</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">74</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">33</td>
-<td style="text-align: right;">54</td>
-<td style="text-align: right;">1.0000000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Ramaphosa</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">253</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">731</td>
-<td style="text-align: right;">511</td>
-<td style="text-align: right;">0.5434104</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Zuma</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">124</td>
-<td style="text-align: right;">256</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">308</td>
-<td style="text-align: right;">1166</td>
-<td style="text-align: right;">0.3731183</td>
-</tr>
-</tbody>
-</table>
+<div id="fig-RF_VarImp_IDF" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment1_files/figure-html/fig-RF_VarImp_IDF-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;8: RF Variable Importance for TF-IDF</figcaption>
+</figure>
 </div>
-</div>
-<p>The depicted figure presents class errors in the TD-IDF model for each president. In comparison to the BoW approach, only sentences attributed to Zuma and Mbeki exhibited improved performance. Other presidents experienced an increase in class errors. For instance, DeKlerk’s class error rose by 13%, while Ramaphosa’s class error saw an 8% increase. This shows how the TF-IDF was not effective across all the presidential classes although it did record a lower overall classification rate of 50,6% compared to that of the BoW which was 51.1%. The figure below shows that the TF-IDF model had similar mean decrease Gini for the words of importance,with the addition of some stop words which were not remove in the case of this model such as ‘the’ and ‘of’</p>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="Assignment1_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="feed-forward-neural-networkffnn" class="level4">
-<h4 class="anchored" data-anchor-id="feed-forward-neural-networkffnn">Feed Forward Neural Network(FFNN)</h4>
-<p>A feedforward neural network (FFNN) is a specific type of neural network architecture in which information flows in a unidirectional manner, from the input to the output, with no feedback loops from the outputs to the inputs. Neural networks are designed to recognize patterns in data and make more accurate decisions than traditional rule-based systems. An FFNN consists of three essential types of layers:</p>
+<section id="feed-forward-neural-network-ffnn" class="level4">
+<h4 class="anchored" data-anchor-id="feed-forward-neural-network-ffnn">Feed Forward Neural Network (FFNN)</h4>
+<p>A feedforward neural network (FFNN) is a specific type of neural network architecture in which information flows in a unidirectional manner, from the input to the output, with no feedback loops from the outputs to the inputs. Neural networks are designed to recognize patterns in data and make more accurate decisions than traditional rule-based systems (Prasanna &amp; Rao,2018). A FFNN consists of three essential types of layers:</p>
 <ol type="1">
 <li><p>Input Layer: The input layer is the initial component of the network where raw data is introduced. The number of nodes in this layer is determined by the number of variables or features present in the dataset. Each node corresponds to one of these input variables.</p></li>
 <li><p>Hidden Layer(s): Hidden layers do the bulk of the work in the neural network. They receive the data from the input layer through weighted connections, where each connection has an associated weight and bias. These weights and biases represent the strength and offset of the connection, and they are adjusted during the training process to optimize the network’s performance. Within the hidden layer, a mathematical transformation known as an activation function is applied to the weighted inputs. This activation function introduces a non-linear aspect to the data, allowing the network to capture more complex relationships within the data. Different types of activation functions can be used, impacting how well the neural network learns and generalizes from the data.</p></li>
@@ -675,156 +597,26 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Assignment1_files/figure-html/NN_BOW-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">0</th>
-<th style="text-align: right;">1</th>
-<th style="text-align: right;">2</th>
-<th style="text-align: right;">3</th>
-<th style="text-align: right;">4</th>
-<th style="text-align: right;">5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">0</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">7</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">253</td>
-<td style="text-align: right;">129</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">99</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">164</td>
-<td style="text-align: right;">380</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">156</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">31</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">15</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">4</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">141</td>
-<td style="text-align: right;">108</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">89</td>
-<td style="text-align: right;">336</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">5</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">87</td>
-<td style="text-align: right;">124</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">553</td>
-</tr>
-</tbody>
-</table>
+<div id="fig-NN-Acc-BoW" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment1_files/figure-html/fig-NN-Acc-BoW-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;9: BoW Neural Network Loss &amp; Accuracy</figcaption>
+</figure>
 </div>
 </div>
+</div>
+<p>::: {#tbl-NN-CM-boW .cell tbl-cap=’ Neural Network Confusion matrix for BoW model’} ::: {.cell-output-display} | | 0| 1| 2| 3| 4| 5| |:–|–:|—:|—:|–:|–:|—:| |0 | 5| 6| 8| 2| 1| 7| |1 | 0| 253| 129| 4| 13| 99| |2 | 0| 164| 380| 3| 16| 156| |3 | 0| 26| 31| 3| 2| 15| |4 | 0| 141| 108| 6| 89| 336| |5 | 1| 87| 124| 2| 26| 553| ::: :::</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="Assignment1_files/figure-html/NN_TF-IDF-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">0</th>
-<th style="text-align: right;">1</th>
-<th style="text-align: right;">2</th>
-<th style="text-align: right;">3</th>
-<th style="text-align: right;">4</th>
-<th style="text-align: right;">5</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">0</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">4</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">311</td>
-<td style="text-align: right;">123</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">24</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">169</td>
-<td style="text-align: right;">404</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">86</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">3</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">35</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">11</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">4</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">120</td>
-<td style="text-align: right;">40</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">428</td>
-<td style="text-align: right;">94</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">5</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">140</td>
-<td style="text-align: right;">101</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">137</td>
-<td style="text-align: right;">414</td>
-</tr>
-</tbody>
-</table>
+<div id="fig-NN-Acc-TF" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment1_files/figure-html/fig-NN-Acc-TF-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;10: TF-IDF Neural Network Loss &amp; Accuracy</figcaption>
+</figure>
 </div>
 </div>
+</div>
+<p>::: {#tbl-NN-CM-TF .cell tbl-cap=’ Neural Network Confusion matrix for TF-IDF model’} ::: {.cell-output-display} | | 0| 1| 2| 3| 4| 5| |:–|–:|—:|—:|–:|—:|—:| |0 | 9| 10| 4| 0| 2| 4| |1 | 2| 311| 123| 1| 38| 24| |2 | 0| 169| 404| 6| 59| 86| |3 | 1| 21| 35| 7| 4| 11| |4 | 0| 120| 40| 3| 428| 94| |5 | 0| 140| 101| 4| 137| 414| ::: :::</p>
 </section>
 </section>
 </section>
