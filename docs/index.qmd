@@ -1,0 +1,493 @@
+---
+title: "STA5073Z Assignment 1"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(stringr)
+library(dplyr)
+library(tidyverse)
+library(rpart)
+library(gridExtra)
+library(ggplot2) 
+
+#install.packages("randomForest")
+library(randomForest)
+#install.packages("tidytext")
+library(tidytext)
+
+#update r and install git
+#install.packages("remotes")
+#remotes::install_github(sprintf("rstudio/%s",
+#                        c("reticulate", "tensorflow","keras")))
+#keras:: install_keras()
+library(keras)
+library(tensorflow)
+#tf$constant("Hello world")
+```
+
+## Abstract
+
+This study focuses on the aspect of machine learning and natural language processing to identify and rank various models for predictive purposes, specifically in the context of classifying sentences to South African presidents based on speeches from 1994 to 2022. The study explores the effectiveness of classification trees, feedforward neural networks (FFNN), and random forests while employing two different input structuring techniques: Bag of Words (BoW) and Term Frequency-Inverse Document Frequency (TF-IDF). The study draws from previous research, showcasing the versatility of BoW and TF-IDF in various applications and machine learning context in preparing text data for analytics. It also draws attention to the importance in choice between these techniques depends on the specific machine learning algorithms and kind of data being assessed. The findings reveal that FFNN performed slightly better than the other models but was still unable to effectively classify speeches to their respective presidents as the data was not equally representative of all the presidents.
+
+## Introduction
+
+The aim of this paper is to identify different machine learning models that can be used for predictive purposes, and rank them according to their ability to do so. With presidential speech from 1994 to 2022 from South African presidents, this paper will review the capacity in which classification trees , feed forward neural networks and random forests are able to accurately classify sentences to their presidents. The input structuring process will also vary between bag of words and TF-IDF so as to ascertain which one is more suitable for the data at hand with a selected machine learning model.
+
+## Exploratory Data analysis
+
+```{r Reading in Data}
+
+set.seed(2022)
+#load("~/STA5073Z_Assignemnt1/Assignement code workspace.RData")
+load("~/dsfi-project1/Assignement code workspace.RData")
+#sona<-sona[-c(2,20),]  remove Motlante and De Klerk in this version of data split
+sona<-sona%>% mutate(speech= str_replace(speech, "\\d{1,2} [A-Za-z]+ \\d{4}", "")) # Remove dates at the start of the speech
+sona<- sona%>% mutate(speech= str_replace(speech, pattern = "^Thursday, ", replacement = ""))# remove dates on 2 remaining Ramaphosa speeches 
+sona<- sona%>% mutate(speech= str_trim(speech, side= "left"))
+
+Sona_S_tokenized<- unnest_tokens(sona, sentence, speech, token = 'sentences') 
+Sona_S_tokenized<- Sona_S_tokenized%>% mutate(sentence= str_replace_all(sentence, "[[:punct:]]", ""))
+
+
+```
+
+The dataset is made up of speeches across a span of 28 years by the last 6 presidents of South Africa.
+
+```{r Top 20 words}
+#| label: fig-Words
+#| fig-cap: "Top 20 words"
+#| 
+Sona_tokenized<-unnest_tokens(sona, word, speech, token = 'words') 
+
+Zuma<-Sona_tokenized%>% group_by(president_13, word)%>% 
+        summarise("count"= n())%>% filter(president_13=="Zuma") %>%
+        arrange(desc(count))%>%
+        filter(!word %in% stop_words$word) %>%
+        filter(rank(desc(count)) <= 15) %>%
+        ggplot(aes(x = reorder(word, count), y = count)) + geom_col() + coord_flip() + xlab('Top 20 words used')+
+   ggtitle("Zuma")+theme(plot.title = element_text(hjust=0.5))
+
+Mbeki<-Sona_tokenized%>% group_by(president_13, word)%>% 
+        summarise("count"= n())%>% filter(president_13=="Mbeki") %>%
+        arrange(desc(count))%>%
+        filter(!word %in% stop_words$word) %>%
+        filter(rank(desc(count)) <= 15) %>%
+        ggplot(aes(x = reorder(word, count), y = count)) + geom_col() + coord_flip() + xlab('Top 20 words used')+
+   ggtitle("Mbeki")+theme(plot.title = element_text(hjust=0.5))
+
+Mandela<-Sona_tokenized%>% group_by(president_13, word)%>% 
+        summarise("count"= n())%>% filter(president_13=="Mandela") %>%
+        arrange(desc(count))%>%
+        filter(!word %in% stop_words$word) %>%
+        filter(rank(desc(count)) <= 15) %>%
+        ggplot(aes(x = reorder(word, count), y = count)) + geom_col() + coord_flip() + xlab('Top 20 words used')+
+   ggtitle("Mandela")+theme(plot.title = element_text(hjust=0.5))
+
+Ramaphosa<-Sona_tokenized%>% group_by(president_13, word)%>% 
+        summarise("count"= n())%>% filter(president_13=="Ramaphosa") %>%
+        arrange(desc(count))%>%
+        filter(!word %in% stop_words$word) %>%
+        filter(rank(desc(count)) <= 15) %>%
+        ggplot(aes(x = reorder(word, count), y = count)) + geom_col() + coord_flip() + xlab('Top 20 words used')+
+   ggtitle("Ramaphosa")+theme(plot.title = element_text(hjust=0.5))
+
+DeKlerk<-Sona_tokenized%>% group_by(president_13, word)%>% 
+        summarise("count"= n())%>% filter(president_13=="deKlerk") %>%
+        arrange(desc(count))%>%
+        filter(!word %in% stop_words$word) %>%
+        filter(rank(desc(count)) <= 15) %>%
+        ggplot(aes(x = reorder(word, count), y = count)) + geom_col() + coord_flip() + xlab('Top 20 words used')+
+   ggtitle("deKlerk")+theme(plot.title = element_text(hjust=0.5))
+
+Motlanthe<-Sona_tokenized%>% group_by(president_13, word)%>% 
+        summarise("count"= n())%>% filter(president_13=="Motlanthe") %>%
+        arrange(desc(count))%>%
+        filter(!word %in% stop_words$word) %>%
+        filter(rank(desc(count)) <= 15) %>%
+        ggplot(aes(x = reorder(word, count), y = count)) + geom_col() + coord_flip() + xlab('Top 20 words used') + ggtitle("Motlanthe")+theme(plot.title = element_text(hjust=0.5))
+
+
+grid.arrange(DeKlerk,Mandela,Mbeki,Motlanthe,Zuma,Ramaphosa, ncol=3,nrow=2)
+```
+
+@fig-Words analysis offers a view into the evolution of linguistic patterns of the different presidents, excluding common stop words commonly found in sentences. A notable shift in the tone of State of the Nation addresses becomes evident when examined over the terms of the presidents.
+
+During De Klerk's tenure, a government-centric tone is evident, characterized by a notable emphasis on references to the constitution, political parties, and elections. Subsequent presidents, however, steered their rhetoric towards the betterment of the nation. Mandela and Mbeki, in particular, championed themes of social welfare and upliftment. Being the first two presidents post-apartheid presidents their main goals were to rebuild the country and break down the racial barriers. Motlanthe, Zuma, and Ramaphosa, on the other hand, honed their focus on fostering the country's economic development. This shift in presidential language reflects the dynamic trajectory of South Africa's national priorities and the evolving role of its leadership in addressing the needs of the nation.
+
+```{r}
+#| fig-cap: "Average Sentence Length"
+#| label: fig-sentences
+Len<-Sona_S_tokenized %>%
+  group_by(president_13) %>%
+  summarise("Total sentences" = n())
+
+sc <- sona %>%
+  group_by(president_13) %>%
+  summarise(speech_count = n())
+
+ Len %>% full_join(sc)%>%
+  mutate("avg_speech_length" = `Total sentences`/speech_count)%>%
+  ggplot( aes(x=president_13, y=avg_speech_length)) + 
+  geom_bar(stat = "identity") +
+   ylab("Average speech length")+
+   xlab("President")
+
+```
+
+@fig-sentences shows long long each presidents speeches run on average.
+
+## Methods
+
+### Input Methods
+
+#### Bag-of words
+
+In the realm of natural language processing, Bag-of-Words (BoW) stands as a valuable text modeling tool. Its primary function is to facilitate the extraction of essential keywords from text while filtering out less critical information. The BoW process begins by establishing a vocabulary based on the words present in the text data. It then represents various speeches by quantifying the frequency of these keywords within each speech. The resulting dataset is an array of speeches against keywords, each entry reflecting the frequency of a specific keyword in a given speech. This foundational approach serves as the basis for machine learning models employed to classify speeches to the president that gave them. The machine learning models tradionally work with numerical data rather than textual data. Text data is unstructured and ML models can only operate with structured data that is well defined so by BoW technique the techniques can be integrated with more ease.
+
+Notably, BoW has found applications in diverse contexts, such as a study in India where it was integrated with Convolutional Neural Networks to classify cases based on keyword analysis from case files. Remarkably, this study achieved an average accuracy rate of 85% (Pillai & Chandran, 2020). The following is a snippet of the BoW done on the SONA speeches. It does how the key words across all speeches become the columns of the array and the tally of each word in the two speeches is in their intersection.
+
+```{r Word-bag}
+
+#| label: tbl-bag-of-words
+#| tbl-cap: "Snippet of Bag-of-Words"
+
+
+identifiers<- 1:nrow(Sona_S_tokenized)
+Sona_S_tokenized$Sent_ID=identifiers
+
+#word_bag<- Sona_S_tokenized%>% 
+            #unnest_tokens(input = sentence, output = word, token = 'words') %>%
+           # group_by(Sent_ID, president_13, word) %>% 
+            #summarise("count"=n())%>% filter(!word %in% stop_words$word)%>%
+            #top_n(200)
+
+tweets_tdf<- Sona_S_tokenized %>%
+  unnest_tokens(input = sentence, output = word, token = 'words') %>%
+  inner_join(word_bag) %>%
+  group_by(Sent_ID, president_13,word) %>%
+  count() %>%  
+  group_by(president_13) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+
+
+bag_of_words <- tweets_tdf %>% 
+  select(Sent_ID, president_13, word, n) %>% 
+  pivot_wider(names_from = word, values_from = n, values_fill = 0)%>%
+  mutate(president_13= as.factor(president_13))
+
+#test<-bag_of_words%>%semi_join(test_data, by= "filename")%>% select(-filename)
+#train<-bag_of_words%>%semi_join(train_data, by= "filename")%>% select(-filename)
+
+knitr::kable(bag_of_words[1:5,c(1,2,5:10)])
+
+```
+
+@tbl-bag-of-words
+
+#### Tf-Idf
+
+Term Frequency- Inverse Document Frequency (TF_IDF) is another input method used for text modelling.  It is similar to  BoW in that it considers the number of times a word is used in a line of text however, it also factors in how important that word is relative to the other words in the document. The TF measures how frequently a term appears in a document by diving the total number of times the term appears in the document by the total number of terms within that document. This emphasizes the terms that occur more frequently than others. The IDF  measures uniqueness/rarity of a term across a collection of documents. It is calculated by taking the logarithm of the total number of documents in the collection divided by the number of documents containing the term. The logarithm is used to scale down the impact of common words. The two part of the statistical measure are calculated as follows:
+
+-   Term Frequency:  (Number of times the term appears in the document) / (Total number of terms in the document)
+
+-   Inverse Document Frequency= In(Total number of documents / Number of documents containing the term)
+
+There have been studies conducted using both BoW and TF-IDF which found that TF-IDF generally out performed BoW when combined with ML models,  however this will not always be the cases because there are countless ML algorithms that exist and each one has a particular method that will allow for the best fit with a given dataset. For example, a study conducted to identify hate speech in tweets found that TF_IDF performed best with Decision trees while BoW performed best with logistic regression, each method obtaining relatively high accuracies. (Akuma et al., 2022)
+
+```{r}
+#| label: tbl-TF-IDF
+#| tbl-cap: "Snippet of TF-IDF"
+
+speeches_tokens <- Sona_S_tokenized %>% 
+  unnest_tokens(input = sentence, output = word, token = 'words')%>%
+  count(president_13, word,filename,Sent_ID ,sort = TRUE)
+
+speeches_document_frequencies <- speeches_tokens %>%
+  group_by(word) %>%
+  summarize(document_frequency = n_distinct(filename))
+
+speeches_tf_idf <- speeches_tokens %>%
+  left_join(speeches_document_frequencies, by = "word") %>%
+  mutate(tf_idf = n * (log2(n_distinct(president_13) / document_frequency)))
+
+
+tfidf <- speeches_tf_idf %>% 
+  select(Sent_ID,president_13, word, tf_idf) %>%  # note the change, using tf-idf
+  pivot_wider(names_from = word, values_from = tf_idf, values_fill = 0)%>%
+  mutate(president_13= as.factor(president_13))
+
+
+knitr:: kable( tfidf[1:5,c(1:6,19)])
+
+```
+
+@tbl-TF-IDF
+
+### Predictive Models & Results
+
+#### Classification Trees
+
+```{r}
+#| fig-cap: "Classification Tree for Bag-of-Words model"
+#| label: fig-CT_BOW
+
+test_data <- Sona_S_tokenized %>% group_by(president_13) %>% slice_sample(prop = 0.3) %>% ungroup()
+train_data <- anti_join(Sona_S_tokenized, test_data, by = c("president_13", "Sent_ID"))
+
+test<-bag_of_words%>%semi_join(test_data, by= "Sent_ID")%>% select(-Sent_ID)
+train<-bag_of_words%>%semi_join(train_data, by= "Sent_ID")%>% select(-Sent_ID)
+
+test<- as.data.frame(test)
+train<- as.data.frame(train)
+
+#fit <- rpart(president_13 ~ ., train, method = 'class')
+options(repr.plot.width = 12, repr.plot.height = 10) # set plot size in the notebook
+plot(fit, main = 'Classification Tree',margin = 0.015)
+text(fit, use.n = TRUE, all = FALSE, cex=.8)
+
+fittedtrain <- predict(fit, type = 'class')
+#predtrain <- table(train$president_13, fittedtrain)
+
+
+#knitr:: kable(predtrain)
+#round(sum(diag(predtrain))/sum(predtrain), 3)  training accuracy
+
+```
+
+@fig-CT_BOW shows a classification tree when text is modelled by BoW. The tree does not have a lot of branches which is indicative of poor classification. The only two presidents can be classified are Mbeki and Zuma , which means every sentence put into the model will return either one of those presidents which is not true. The following table shows the classification using the test dataset:
+
+```{r CT_BOW test set}
+#| label: tbl-CT-CM
+#| tbl-cap: "Confusion matrix for Bag-of-words model"
+
+#fittedtest <- predict(fit, newdata = test, type = 'class')
+#predtest <- table(test$president_13, fittedtest)
+knitr::kable(predtest)
+#round(sum(diag(predtest))/sum(predtest), 3)  test accuracy
+
+```
+
+The recorded classification rate of this model was 30% meaning the model The model is performing better than random guessing but still has significant room for improvement. The possible reasons for this low classification are unclear as it could be attributed to the model's performance itself or underlying issues with the data. As previously mentioned in the data analysis, the number of speeches each president makes is different with some making one and others making more than 5, causing a high degree of class imbalance.
+
+```{r CT_TF-IDF}
+
+#| fig-cap: "Classification Tree for TF-IDF model"
+#| label: fig-CT_TF-IDF
+
+test2<-tfidf%>%semi_join(test_data, by= "Sent_ID")%>% select(-Sent_ID)
+train2<-tfidf%>%semi_join(train_data, by= "Sent_ID")%>% select(-Sent_ID)
+
+test2<- as.data.frame(test2)
+train2<-as.data.frame(train2)
+
+#fit2 <- rpart(president_13 ~ ., train2, method = 'class')
+options(repr.plot.width = 12, repr.plot.height = 10) # set plot size in the notebook
+plot(fit2, main = 'Classification Tree', margin = 0.015)
+text(fit2, use.n = FALSE, all = FALSE, cex=.7)
+
+fittedtrain2 <- predict(fit2, type = 'class')
+predtrain2 <- table(train2$president_13, fittedtrain2)
+#round(sum(diag(predtrain2))/sum(predtrain2), 3)  #training accuracy
+
+
+
+```
+
+@fig-CT_TF-IDF
+
+```{r}
+#| label: tbl-CT-CM-TF
+#| tbl-cap: "Confusion matrix for TF-IDF model"
+
+#fittedtest2 <- predict(fit2, newdata = test2, type = 'class')
+#predtest2 <- table(test2$president_13, fittedtest2)
+knitr:: kable(predtest2)
+#round(sum(diag(predtest2))/sum(predtest2), 3)  test accuracy
+
+```
+
+@tbl-CT-CM-TF
+
+The classification rate achieved using the TF-IDF tool stands at 37.8%, demonstrating a slight improvement compared to the performance of the bag of words method, which doesn't take into account the associated word weights. The table above shows how the observations are still only distributed between Mbeki and Zuma but this time the classification of the observations is more equally distributed between the two. Nevertheless, this accuracy rate remains notably low, suggesting that a basic classification tree might not be the most effective predictive model for the speech text data under investigation. Consequently, the next model to be explored will build upon the foundation of these basic classification trees, aiming to enhance predictive performance and capture the underlying complexities of the text data.
+
+#### Random Forest
+
+Random Forest revolves around an ensemble of decision trees reinforced by bagging. Bagging, short for Bootstrap Aggregating, reduces variance and adds stability to these decision trees. It begins by creating multiple subsets of the training data, each of equal size to the original dataset, formed by random selection with potential repetition. These bootstrapped subsets are then used to independently build individual decision trees, each providing a unique perspective on the text data. Once the trees are constructed, they collectively contribute to the final prediction through a majority vote. This aggregation enhances robustness and accuracy, particularly beneficial for text data.
+
+Additionally, Random Forest introduces random feature selection, where only a subset of features is considered at each node during tree construction, helping to reduce correlation between the trees and avoid overfitting, which is a common challenge when dealing with high-dimensional text data. Additionally, it offers the capability to assess variable importance by considering the random feature selection, providing insights into the crucial elements determining the president which said the given sentence. The figure below shows the error rate of the random forest as the number of trees increase.
+
+```{r RF_BOW}
+#| fig-cap: "BoW Random forest error rate"
+#| label: fig-RF_BOW
+
+train<- as.data.frame(train)
+#classifier_RF = randomForest(x = train[,-1], y = train[,1],ntree = 20) # commented out becuase html file takes too lon to render the document
+  
+plot(classifier_RF$err.rate[,1], xlab="Trees", ylab="Error rate", type="l") #view the output of the random forest
+
+
+
+```
+
+@fig-RF_BOW
+
+As the number of trees in the model increases, it acquires a deeper understanding of the data, leading to a reduction in the error rate. Beginning with an initial error rate of 60%, by the 20th tree, the model shows improvement, successfully decreasing the error rate by 10%. This method is computationally expensive and so only 20 trees were considered. At this point it is unclear whether an increase in the number of trees will improve the accuracy of the test or lead to diminishing returns. All that can be said is that the error rate is better than that of the previous model.
+
+```{r}
+#| label: tbl-RF-CM-BOW
+#| tbl-cap: " Random Forest Confusion matrix for BoW model"
+
+knitr:: kable(classifier_RF$confusion)
+
+#test<- as.data.frame(test)
+#y_pred = predict(classifier_RF, newdata = test[,-1]) 
+  
+# Confusion Matrix 
+#confusion_mtx = table(test[,1], y_pred) 
+#confusion_mtx 
+#round(sum(diag(confusion_mtx))/sum(confusion_mtx), 3) # test accuracy
+```
+
+For the presidents with fewer speeches in the dataset, such as deKlerk and Motlanthe, the error rates are notably high, with deKlerk reaching an error rate of 85.1% and Motlanthe experiencing a much more substantial error rate of 99.5%. Interestingly, this analysis reveals recurring patterns where a significant portion of deKlerk's speeches are misclassified as Zuma, and Motlanthe's speeches are predominantly classified as Mbeki.
+
+On the other hand, for more prolific presidents like Mbeki and Zuma, the error rates are comparatively lower, with Mbeki achieving an error rate of 47.1% and Zuma having an error rate of 41.4%. However, it's worth noting that the error rate for Zuma's speeches has seen a notable increase in comparison to previous models, while Mbeki's error rate has seen a significant decrease. These observations shed light on the model's performance in handling classes with imbalanced data, indicating potential areas for improvement in correctly classifying the speeches of less frequently represented presidents.
+
+```{r}
+#| fig-cap: "RF Variable Importance"
+#| label: fig-RF_VarImp
+
+# Variable importance plot 
+varImpPlot(classifier_RF,main = "Variable Importance with BoW" ) 
+
+```
+
+@fig-RF_VarImp shows the top 30 most important features, each possessing a mean decrease Gini score exceeding 5. This score reflects the feature's contribution to the reduction of Gini impurity, with higher scores indicating greater importance in the model's predictive capability. The analysis has identified the two most influential words as 'compatriots' and 'regard,' both exhibiting mean decrease Gini scores exceeding 30. Following ,with a score of almost half, are 'rand' and 'capture' with mean decrease Gini scores just below 15. The same modelling is conducted on the TF-IDF data and the results were as follows:
+
+```{r}
+train2<- as.data.frame(train2)
+#classifier_RF2 = randomForest(x = train2[,-1], y = train2[,1],ntree = 20) # commented out becuase html file takes too lon to render the document
+  
+plot(classifier_RF2$err.rate[,1], xlab="Trees", ylab="Error rate", type="l") #view the output of the random forest
+
+#| fig-cap: "BoW Random forest error rate"
+#| label: fig-RF_BOW
+
+```
+
+The gradual decrease in error rate is almost identical to the bag of words model starting at about 60% and falling to 52% after 20 trees. This similarity may suggest that, at least up to this point, the additional complexity brought by the ensemble learning technique (as represented by the number of trees) yields a consistent and comparable improvement in predictive accuracy for both the BoW model and TF-IDF.
+
+```{r}
+knitr:: kable(classifier_RF2$confusion)
+#y_pred2 = predict(classifier_RF2, newdata = test2[,-1]) 
+  
+# Confusion Matrix 
+#confusion_mtx2 = table(test2[,1], y_pred2) 
+#confusion_mtx2 
+#round(sum(diag(confusion_mtx2))/sum(confusion_mtx2), 3) # test accuracy
+```
+
+The depicted figure presents class errors in the TD-IDF model for each president. In comparison to the BoW approach, only sentences attributed to Zuma and Mbeki exhibited improved performance. Other presidents experienced an increase in class errors. For instance, DeKlerk's class error rose by 13%, while Ramaphosa's class error saw an 8% increase. This shows how the TF-IDF was not effective across all the presidential classes although it did record a lower overall classification rate of 50,6% compared to that of the BoW which was 51.1%. The figure below shows that the TF-IDF model had similar mean decrease Gini for the words of importance,with the addition of some stop words which were not remove in the case of this model such as 'the' and 'of'
+
+```{r}
+# Variable importance plot 
+varImpPlot(classifier_RF2,main = "Variable Importance with TF-IDF" ) 
+#| fig-cap: "RF Variable Importance"
+#| label: fig-RF_VarImp_IDF
+```
+
+#### Feed Forward Neural Network(FFNN)
+
+A feedforward neural network (FFNN) is a specific type of neural network architecture in which information flows in a unidirectional manner, from the input to the output, with no feedback loops from the outputs to the inputs. Neural networks are designed to recognize patterns in data and make more accurate decisions than traditional rule-based systems. An FFNN consists of three essential types of layers:
+
+1.  Input Layer: The input layer is the initial component of the network where raw data is introduced. The number of nodes in this layer is determined by the number of variables or features present in the dataset. Each node corresponds to one of these input variables.
+
+2.  Hidden Layer(s): Hidden layers do the bulk of the work in the neural network. They receive the data from the input layer through weighted connections, where each connection has an associated weight and bias. These weights and biases represent the strength and offset of the connection, and they are adjusted during the training process to optimize the network's performance. Within the hidden layer, a mathematical transformation known as an activation function is applied to the weighted inputs. This activation function introduces a non-linear aspect to the data, allowing the network to capture more complex relationships within the data. Different types of activation functions can be used, impacting how well the neural network learns and generalizes from the data.
+
+3.  Output Layer: The output layer is the final stage of the network responsible for producing the predicted values or classifications for each observation. The number of nodes in this layer is typically determined by the number of classes in categorical data or the desired output format. Each output node represents the probability that an observation belongs to a specific. The class with the highest probability is selected as the network's prediction.
+
+```{r NN_BOW}
+# target1 <- as.integer(factor(train$president_13)) - 1
+# target2<-as.integer(factor(test$president_13)) - 1
+# 
+# y_train <- to_categorical(target1)
+# y_test_original <- target2
+# y_test <- to_categorical(target2)
+# 
+# x_train<-as.matrix(train[,-1])
+# x_test<-as.matrix(test[,-1])
+# 
+# model <- keras_model_sequential() 
+#model%>%
+#    layer_dense(units = 64, activation = 'relu', input_shape = c(11669))%>%
+#    layer_dense(units= 32, activation='relu', kernel_regularizer = regularizer_l1(0.01))%>%
+#    layer_dense(units = 6, activation = 'softmax')
+
+# model %>% compile(
+#   loss = 'categorical_crossentropy',
+#   optimizer = optimizer_adam(learning_rate = 0.0005),
+#   metrics = c('accuracy'),
+# )
+
+
+#history <- model %>% fit(
+#  x_train, y_train, 
+ # epochs = 25, batch_size = 5, validation_split = 0.2)
+
+plot(history)
+
+# model %>% evaluate(x_test, y_test)
+# y_test_hat <- model %>% predict(x_test) %>% k_argmax() %>% as.numeric()
+# nn_table<-table(y_test_original, y_test_hat)
+knitr:: kable(nn_table)
+# round(sum(diag(nn_table))/sum(nn_table), 3) 
+```
+
+```{r NN_TF-IDF}
+# target3 <- as.integer(factor(train2$president_13)) - 1
+# target4<-as.integer(factor(test2$president_13)) - 1
+# 
+# y_train2 <- to_categorical(target3)
+# y_test_original2 <- target4
+# y_test2 <- to_categorical(target4)
+# 
+# x_train2<-as.matrix(train2[,-1])
+# x_test2<-as.matrix(test2[,-1])
+
+#model2 <- keras_model_sequential() 
+#model2%>%
+#    layer_dense(units = 64, activation = 'relu', input_shape = c(12234))%>%
+#  layer_dense(units= 32, activation='relu', kernel_regularizer = regularizer_l1(0.01))%>%
+#    layer_dense(units = 6, activation = 'softmax')
+
+# model2 %>% compile(
+#   loss = 'categorical_crossentropy',
+#   optimizer = optimizer_adam(learning_rate = 0.0005),
+#   metrics = c('accuracy'),
+# )
+
+
+#history2 <- model2 %>% fit(
+# x_train2, y_train2, 
+#  epochs = 25, batch_size = 5, validation_split = 0.2)
+
+plot(history2)
+
+# model2 %>% evaluate(x_test2, y_test2)
+# y_test_hat2 <- model2 %>% predict(x_test2) %>% k_argmax() %>% as.numeric()
+# nn_table2<-table(y_test_original2, y_test_hat2)
+knitr:: kable(nn_table2)
+#round(sum(diag(nn_table2))/sum(nn_table2), 3) 
+```
+
+## Discussion
+
+## Conclusion
+
+Potentially explore CNNs for even higher accuracy results -It is proven that CNN has significance in the image processing domain by classifying and identifying the object, but it is highly feasible for using CNN in NLP domains.(rephrase)
