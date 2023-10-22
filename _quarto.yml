@@ -6,12 +6,11 @@ website:
   title: "A Quarto Website"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
+      - index.qmd
       - references.qmd
 
 format:
   html:
-    theme: darkly
+    theme: cosmo
     css: styles.css
     toc: true
